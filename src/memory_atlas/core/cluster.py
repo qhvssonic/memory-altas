@@ -9,6 +9,12 @@ from typing import Any
 from memory_atlas.core.registry import Registry
 
 
+def _default_cluster_summary(memory_labels: list[str], entity_tags: list[str]) -> str:
+    """Generate a simple cluster summary without LLM."""
+    tags = ", ".join(entity_tags[:5]) if entity_tags else "misc"
+    return f"[Cluster: {tags}] {len(memory_labels)} memories — {'; '.join(memory_labels[:5])}"
+
+
 @dataclass
 class MemoryCluster:
     """A group of related memories bundled together.
@@ -137,6 +143,39 @@ class ClusterManager:
             "DELETE FROM memory_clusters WHERE id = ?", [cluster_id]
         )
         return True
+
+    def get_cluster_lod(self, cluster_id: str, lod: str = "L0") -> str | None:
+        """Get a cluster's content at a specific LOD level.
+
+        L0: one-line tag — "cluster:jwt (5 memories)"
+        L1: cluster summary with member labels
+        L2: all member summaries concatenated
+        """
+        cluster = self.get_cluster(cluster_id)
+        if not cluster:
+            return None
+
+        if lod == "L0":
+            return f"{cluster.name} ({len(cluster.memory_ids)} memories)"
+
+        if lod == "L1":
+            if not cluster.summary:
+                labels = []
+                for mid in cluster.memory_ids[:10]:
+                    rec = self.registry.get_memory(mid)
+                    if rec:
+                        labels.append(rec.label)
+                cluster.summary = _default_cluster_summary(labels, cluster.entity_tags)
+                self._save(cluster)
+            return cluster.summary
+
+        # L2: all member summaries
+        parts = []
+        for mid in cluster.memory_ids:
+            rec = self.registry.get_memory(mid)
+            if rec:
+                parts.append(f"- {rec.summary or rec.label}")
+        return f"[{cluster.name}]\n" + "\n".join(parts)
 
     def _save(self, cluster: MemoryCluster) -> None:
         import json

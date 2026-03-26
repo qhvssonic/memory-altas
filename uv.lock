@@ -1213,6 +1213,7 @@ dependencies = [
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "numpy", version = "2.4.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "pyyaml" },
+    { name = "typer" },
 ]
 
 [package.optional-dependencies]
@@ -1238,6 +1239,7 @@ requires-dist = [
     { name = "numpy", specifier = ">=1.24.0" },
     { name = "pyyaml", specifier = ">=6.0" },
     { name = "sentence-transformers", marker = "extra == 'local-embedding'", specifier = ">=2.2.0" },
+    { name = "typer", specifier = ">=0.12.0" },
 ]
 provides-extras = ["local-embedding", "langchain"]
 

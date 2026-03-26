@@ -65,17 +65,23 @@ MemoryAtlas 的核心卖点是 Scene Manager（场景管理器），这是目前
 | | 多智能体命名空间 | ✅ 完成 | P1 | agent_id 分区 |
 | **记忆簇** | MemoryCluster 数据模型 | ✅ 完成 | P0 | DuckDB 表 + CRUD |
 | | 簇的自动聚合 | ✅ 完成 | P1 | 基于实体自动归簇 |
-| | 簇级别 LOD | ⬜ 待开始 | P1 | 整簇摘要 |
+| | 簇级别 LOD | ✅ 完成 | P1 | L0/L1/L2 三级簇摘要 |
 | **Embedding 扩展** | Ollama 本地模型 | ✅ 完成 | P0 | 通过 LiteLLM |
 | | 自定义 Embedder 接口 | ✅ 完成 | P1 | CustomEmbedder(embed_fn, dim) |
-| **Web UI** | 记忆图谱可视化 | ⬜ 待开始 | P2 | 独立 HTML，可选 |
-| **测试** | v0.2 新功能测试 | ✅ 完成 | P0 | 13 tests |
+| **Web UI** | ~~记忆图谱可视化~~ | 🚫 取消 | ~P2~ | 不做 |
+| **测试** | v0.2 新功能测试 | ✅ 完成 | P0 | 19 tests |
 
-### v0.3.0 — 生态集成（规划中）
+### v0.3.0 — 生态集成
 
-- [ ] 其他框架适配（LlamaIndex、CrewAI 等）
-- [ ] MCP Server
-- [ ] CLI 工具
+目标：CLI 工具、其他框架适配。
+
+| 模块 | 任务 | 状态 | 优先级 | 备注 |
+|---|---|---|---|---|
+| **CLI** | 基础命令 (init/ingest/search/stats) | ✅ 完成 | P0 | typer, 8 个命令 |
+| | forget/export/import 命令 | ✅ 完成 | P0 | |
+| | cluster 管理命令 | ✅ 完成 | P1 | |
+| **框架适配** | LlamaIndex 适配 | ✅ 完成 | P1 | MemoryAtlasRetriever |
+| | CrewAI 适配 | ✅ 完成 | P1 | MemoryAtlasTool |
 
 ## 设计决策记录
 

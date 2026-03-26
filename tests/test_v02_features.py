@@ -250,3 +250,41 @@ class TestAutoClusterOnIngest:
         clusters_after = cm.list_clusters()
         assert len(clusters_after) == 1  # still 1 cluster, not 2
         assert len(clusters_after[0].memory_ids) == 4  # now has 4 members
+
+
+class TestClusterLOD:
+    def test_cluster_lod_l0(self, env):
+        reg, fs, tmp = env
+        cm = ClusterManager(reg)
+        c = cm.create_cluster("auth", ["m1", "m2", "m3"])
+        text = cm.get_cluster_lod(c.id, "L0")
+        assert "auth" in text
+        assert "3 memories" in text
+
+    def test_cluster_lod_l1_generates_summary(self, env):
+        reg, fs, tmp = env
+        cm = ClusterManager(reg)
+        # Insert real memories so L1 can read labels
+        for i in range(3):
+            reg.insert_memory(MemoryRecord(id=f"cl{i}", label=f"jwt issue {i}"))
+        c = cm.create_cluster("jwt-cluster", [f"cl{i}" for i in range(3)], entity_tags=["jwt"])
+        text = cm.get_cluster_lod(c.id, "L1")
+        assert "jwt" in text
+        assert "3 memories" in text
+
+    def test_cluster_lod_l2_all_summaries(self, env):
+        reg, fs, tmp = env
+        cm = ClusterManager(reg)
+        for i in range(3):
+            reg.insert_memory(MemoryRecord(
+                id=f"l2_{i}", label=f"topic {i}", summary=f"detail about topic {i}"
+            ))
+        c = cm.create_cluster("topics", [f"l2_{i}" for i in range(3)])
+        text = cm.get_cluster_lod(c.id, "L2")
+        assert "detail about topic 0" in text
+        assert "detail about topic 2" in text
+
+    def test_cluster_lod_nonexistent(self, env):
+        reg, fs, tmp = env
+        cm = ClusterManager(reg)
+        assert cm.get_cluster_lod("nope") is None
