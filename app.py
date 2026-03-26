@@ -64,12 +64,12 @@ class DeepSeekLLMWrapper:
 
 
 # === Init ===
-DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
+MODELSCOPE_TOKEN = os.environ.get("MODELSCOPE_API_KEY", "")
 
 chat_llm = ChatOpenAI(
-    model="deepseek-chat",
-    api_key=DEEPSEEK_API_KEY or "sk-placeholder",
-    base_url="https://api.deepseek.com",
+    model="deepseek-ai/DeepSeek-V3.2",
+    api_key=MODELSCOPE_TOKEN or "sk-placeholder",
+    base_url="https://api-inference.modelscope.cn/v1",
     temperature=0.7,
 )
 
@@ -90,7 +90,7 @@ _counter = [0]
 
 
 def extract_entities_llm(text: str) -> list[str]:
-    if not DEEPSEEK_API_KEY:
+    if not MODELSCOPE_TOKEN:
         words = re.findall(r"[a-zA-Z]{3,}", text)
         return list(set(w.lower() for w in words))[:5]
     try:
@@ -142,9 +142,9 @@ def ingest_turn(user_msg: str, assistant_msg: str):
 def chat(user_message: str, history: list[dict]):
     if not user_message.strip():
         return history, get_memory_status()
-    if not DEEPSEEK_API_KEY:
+    if not MODELSCOPE_TOKEN:
         history.append({"role": "user", "content": user_message})
-        history.append({"role": "assistant", "content": "⚠️ 请设置 DEEPSEEK_API_KEY 环境变量"})
+        history.append({"role": "assistant", "content": "⚠️ 请设置 MODELSCOPE_API_KEY 环境变量"})
         return history, get_memory_status()
 
     memories = scene.get_memory_view(user_message)

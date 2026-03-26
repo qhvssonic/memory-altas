@@ -78,19 +78,27 @@ class DeepSeekLLMWrapper:
 
 # === Init ===
 DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
-if not DEEPSEEK_API_KEY:
-    print("⚠️  请设置 DEEPSEEK_API_KEY 环境变量")
-    print("   Windows: set DEEPSEEK_API_KEY=sk-xxx")
-    print("   Linux:   export DEEPSEEK_API_KEY=sk-xxx")
-    sys.exit(1)
+MODELSCOPE_TOKEN = os.environ.get("MODELSCOPE_API_KEY", "")
 
-# DeepSeek LLM
-chat_llm = ChatOpenAI(
-    model="deepseek-chat",
-    api_key=DEEPSEEK_API_KEY,
-    base_url="https://api.deepseek.com",
-    temperature=0.7,
-)
+if MODELSCOPE_TOKEN:
+    chat_llm = ChatOpenAI(
+        model="deepseek-ai/DeepSeek-V3.2",
+        api_key=MODELSCOPE_TOKEN,
+        base_url="https://api-inference.modelscope.cn/v1",
+        temperature=0.7,
+    )
+elif DEEPSEEK_API_KEY:
+    chat_llm = ChatOpenAI(
+        model="deepseek-chat",
+        api_key=DEEPSEEK_API_KEY,
+        base_url="https://api.deepseek.com",
+        temperature=0.7,
+    )
+else:
+    print("⚠️  请设置 MODELSCOPE_API_KEY 或 DEEPSEEK_API_KEY 环境变量")
+    print("   set MODELSCOPE_API_KEY=ms-xxx  (魔搭免费)")
+    print("   set DEEPSEEK_API_KEY=sk-xxx    (DeepSeek)")
+    sys.exit(1)
 
 # MemoryAtlas
 DATA_DIR = str(Path(__file__).parent.parent / "memory_data")

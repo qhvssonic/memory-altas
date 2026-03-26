@@ -4,6 +4,6 @@
   "resource_configuration": "platform/2v-cpu-16g-mem",
   "base_image": "ubuntu22.04-py311-torch2.3.1-modelscope1.31.0",
   "environment_variables": [
-    {"name": "DEEPSEEK_API_KEY", "value": "请替换为你的DeepSeek API Key"}
+    {"name": "MODELSCOPE_API_KEY", "value": "请替换为你的ModelScope Token"}
   ]
 }
