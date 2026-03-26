@@ -114,6 +114,34 @@ _counter = [0]
 
 # === Core chat function ===
 
+def extract_entities_llm(text: str) -> list[str]:
+    """用 DeepSeek 提取实体关键词。"""
+    try:
+        resp = chat_llm.invoke([
+            {"role": "system", "content": (
+                "从用户消息中提取关键实体（技术概念、工具名、模块名等）。"
+                "只返回 JSON 数组，例如 [\"jwt\", \"refresh token\", \"redis\"]。"
+                "不要解释，不要 markdown，只返回 JSON 数组。最多 5 个。"
+            )},
+            {"role": "user", "content": text},
+        ])
+        import json, re
+        raw = resp.content.strip()
+        if "```" in raw:
+            match = re.search(r"```(?:json)?\s*\n?(.*?)\n?```", raw, re.DOTALL)
+            if match:
+                raw = match.group(1)
+        entities = json.loads(raw)
+        if isinstance(entities, list):
+            return [str(e).lower().strip() for e in entities if e][:5]
+    except Exception:
+        pass
+    # 回退：简单分词
+    import re
+    words = re.findall(r"[a-zA-Z]{3,}", text)
+    return list(set(w.lower() for w in words))[:5]
+
+
 def ingest_turn(user_msg: str, assistant_msg: str):
     """将一轮对话写入记忆。"""
     content = f"用户: {user_msg}\n助手: {assistant_msg}"
@@ -125,10 +153,7 @@ def ingest_turn(user_msg: str, assistant_msg: str):
     summary = content[:300]
     emb = embedder.embed([summary])[0]
 
-    # 简单实体提取：取用户消息中的关键词
-    import re
-    words = re.findall(r"[\u4e00-\u9fff]+|[a-zA-Z]{3,}", user_msg)
-    entities = list(set(w.lower() for w in words if len(w) >= 2))[:5]
+    entities = extract_entities_llm(user_msg)
 
     registry.insert_memory(MemoryRecord(
         id=mid, session_id="chat", label=user_msg[:80],
@@ -189,9 +214,7 @@ def chat(user_message: str, history: list[dict]):
     ingest_turn(user_message, assistant_msg)
 
     # 6. 场景管理更新（视锥剔除等）
-    import re
-    words = re.findall(r"[\u4e00-\u9fff]+|[a-zA-Z]{3,}", user_message)
-    entities = list(set(w.lower() for w in words if len(w) >= 2))[:5]
+    entities = extract_entities_llm(user_message)
     scene.update(user_message, current_entities=entities)
 
     return history, get_memory_status()
