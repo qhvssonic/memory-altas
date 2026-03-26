@@ -233,7 +233,7 @@ with gr.Blocks(title="MemoryAtlas + DeepSeek Agent") as app:
 
     with gr.Row():
         with gr.Column(scale=3):
-            chatbot = gr.Chatbot(label="对话", height=500, type="messages")
+            chatbot = gr.Chatbot(label="对话", height=500)
             msg_input = gr.Textbox(
                 label="输入消息",
                 placeholder="试试: 我在做一个用户认证模块，用 JWT...",
