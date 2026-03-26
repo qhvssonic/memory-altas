@@ -2,7 +2,7 @@
 
 > 最后更新：2026-03-26
 
-## 项目状态：🟢 v0.1.0 核心实现完成
+## 项目状态：🟢 v0.1.0 MVP 完成
 
 ## 核心差异化：游戏引擎式场景管理
 
@@ -19,7 +19,7 @@ MemoryAtlas 的核心卖点是 Scene Manager（场景管理器），这是目前
 |---|---|---|---|---|
 | **项目基础** | 项目结构搭建 | ✅ 完成 | P0 | pyproject.toml, src 结构, LICENSE |
 | | README.md | ✅ 完成 | P0 | 突出游戏引擎灵感和差异化 |
-| | CI/CD 配置 | ⬜ 待开始 | P1 | GitHub Actions |
+| | CI/CD 配置 | ✅ 完成 | P1 | GitHub Actions (Python 3.10/3.11/3.12) |
 | **存储层** | DuckDB 元数据管理 (registry) | ✅ 完成 | P0 | 6张表 CRUD + 向量搜索 + 实体/树节点/话题转换 |
 | | Markdown 文件存储 (file_store) | ✅ 完成 | P0 | MemoryChunk 序列化/反序列化, frontmatter 解析 |
 | | 三层缓存 (cache) | ✅ 完成 | P0 | Hot(dict)/Warm(LRU)/Cold, 升降级, 容量管理 |
@@ -36,7 +36,7 @@ MemoryAtlas 的核心卖点是 Scene Manager（场景管理器），这是目前
 | **检索引擎** | 向量检索 (vector_search) | ✅ 完成 | P0 | DuckDB list_cosine_similarity |
 | | 树状推理检索 (tree_search) | ✅ 完成 | P0 | LLM 导航树状索引, 深度优先 |
 | | 双路融合排序 (fusion) | ✅ 完成 | P0 | 加权合并 + 双路命中 20% boost |
-| **维护** | 遗忘机制 | ⬜ 待开始 | P1 | 活跃度衰减 + 压缩归档 |
+| **维护** | 遗忘机制 | ✅ 完成 | P1 | 活跃度衰减 + 压缩/归档, ForgettingManager |
 | **LLM 层** | LiteLLM 封装 | ✅ 完成 | P0 | complete + complete_json |
 | | Embedding 提供者 | ✅ 完成 | P0 | local/openai/cohere 工厂模式 |
 | **SDK 接口** | MemoryAtlasMiddleware | ✅ 完成 | P0 | 4 个钩子: before/after_agent, before/after_model |
@@ -44,12 +44,12 @@ MemoryAtlas 的核心卖点是 Scene Manager（场景管理器），这是目前
 | | 自动写入判断 | ✅ 完成 | P0 | rule_based + llm 两种策略 |
 | | 手动接口 | ✅ 完成 | P1 | bulk_ingest / retrieve / expand |
 | | 配置管理 | ✅ 完成 | P0 | dataclass + JSON 序列化 |
-| **基准测试** | 缓存命中率测试 | ⬜ 待开始 | P0 | 证明缓存价值 |
-| | 预加载准确率测试 | ⬜ 待开始 | P0 | 证明预加载价值 |
-| | Token 节省率测试 | ⬜ 待开始 | P0 | 证明 LOD 价值 |
-| | 延迟对比测试 | ⬜ 待开始 | P1 | 缓存 vs 冷区 |
-| **测试** | 单元测试 | ✅ 完成 | P0 | 61 tests, 9 文件, uv run pytest |
-| | 集成测试 | ⬜ 待开始 | P1 | 端到端流程 |
+| **基准测试** | 缓存命中率测试 | ✅ 完成 | P0 | 76% 命中率 (目标>60%) |
+| | 预加载准确率测试 | ✅ 完成 | P0 | 100% 准确率 (目标>50%) |
+| | Token 节省率测试 | ✅ 完成 | P0 | 93.4% 节省 (目标>40%) |
+| | 延迟对比测试 | ✅ 完成 | P1 | 缓存 0.3µs vs 冷区 22ms, 69000x 加速 |
+| **测试** | 单元测试 | ✅ 完成 | P0 | 72 tests, 11 文件, uv run pytest |
+| | 集成测试 | ✅ 完成 | P1 | 6 个端到端测试 (FakeEmbedder/FakeLLM) |
 | **文档** | API 文档 | ⬜ 待开始 | P1 | |
 | | 使用示例 | ✅ 完成 | P0 | examples/langchain_agent.py |
 
@@ -116,11 +116,7 @@ MemoryAtlas 的核心卖点是 Scene Manager（场景管理器），这是目前
 
 ### 待完成
 
-- 单元测试 + 集成测试
-- 基准测试 (缓存命中率/预加载准确率/Token 节省率/延迟对比)
-- CI/CD (GitHub Actions)
 - API 文档
-- 遗忘机制 (活跃度衰减)
 
 ## 灵感来源
 

@@ -18,6 +18,7 @@ from memory_atlas.ingestion.chunker import Chunker
 from memory_atlas.ingestion.extractor import Extractor
 from memory_atlas.ingestion.summarizer import Summarizer
 from memory_atlas.scene.manager import SceneManager
+from memory_atlas.maintenance.forgetting import ForgettingManager, ForgetResult
 
 
 class MemoryEngine:
@@ -178,6 +179,14 @@ class MemoryEngine:
     def stats(self) -> dict:
         """Return engine statistics."""
         return self.scene.stats()
+
+    def forget(self, limit: int = 500) -> ForgetResult:
+        """Run a forgetting cycle: compress/archive low-activity memories."""
+        fm = ForgettingManager(
+            self.registry, self.file_store,
+            decay_lambda=self.config.decay_lambda,
+        )
+        return fm.run_cycle(limit=limit)
 
     def close(self) -> None:
         """Clean up resources."""
