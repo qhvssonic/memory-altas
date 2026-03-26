@@ -204,23 +204,45 @@ def get_memory_status() -> str:
     clusters = cluster_mgr.list_clusters()
 
     lines = [f"📊 总记忆: {total} | 热区: {s['hot']} | 温区: {s['warm']} | 冷区: {s['cold']} | 轮次: {s['turn_count']}"]
+    lines.append("─" * 40)
 
+    # 热区
     hot = scene.cache.get_hot()
+    lines.append(f"\n🔴 热区 Hot ({len(hot)}):")
     if hot:
-        lines.append(f"\n🔴 热区 ({len(hot)}):")
-        for m in hot[:5]:
-            lines.append(f"  {m.id}: {m.label[:50]}")
+        for m in hot[:8]:
+            lines.append(f"  [{m.lod}] {m.id}: {m.label[:50]}")
+    else:
+        lines.append("  (空 — 发起检索后记忆会进入热区)")
 
+    # 温区
     warm = scene.cache.get_warm()
+    lines.append(f"\n🟡 温区 Warm ({len(warm)}):")
     if warm:
-        lines.append(f"\n🟡 温区 ({len(warm)}):")
-        for m in warm[:5]:
-            lines.append(f"  {m.id}: {m.label[:50]}")
+        for m in warm[:8]:
+            lines.append(f"  [{m.lod}] {m.id}: {m.label[:50]}")
+    else:
+        lines.append("  (空 — 话题转换后记忆从热区降级到这里)")
 
+    # 冷区（从 DuckDB 列出所有记忆）
+    all_mems = registry.list_memories(limit=20)
+    lines.append(f"\n🔵 全部记忆 ({total}):")
+    if all_mems:
+        for m in all_mems:
+            tier_icon = "🔴" if m.cache_tier == "hot" else "🟡" if m.cache_tier == "warm" else "⚪"
+            lines.append(f"  {tier_icon} {m.id}: {m.label[:50]}")
+            if m.summary and m.summary != m.label:
+                lines.append(f"      摘要: {m.summary[:80]}")
+    else:
+        lines.append("  (空 — 开始对话后记忆会自动积累)")
+
+    # 记忆簇
     if clusters:
         lines.append(f"\n📦 记忆簇 ({len(clusters)}):")
         for c in clusters:
-            lines.append(f"  {c.name} ({len(c.memory_ids)} 条)")
+            lines.append(f"  {c.name} ({len(c.memory_ids)} 条) 标签: {c.entity_tags}")
+    else:
+        lines.append(f"\n📦 记忆簇: 暂无 (同一实体关联 ≥3 条记忆时自动创建)")
 
     return "\n".join(lines)
 
@@ -247,7 +269,7 @@ with gr.Blocks(title="MemoryAtlas + DeepSeek Agent") as app:
             memory_status = gr.Textbox(
                 label="🗄️ 记忆引擎状态",
                 value=get_memory_status(),
-                lines=25,
+                lines=30,
                 interactive=False,
             )
 
