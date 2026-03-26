@@ -197,3 +197,56 @@ class TestEmbedderExtensions:
     def test_custom_requires_fn(self):
         with pytest.raises(ValueError, match="embed_fn"):
             create_embedder(mode="custom")
+
+
+class TestAutoClusterOnIngest:
+    """Test that clusters are auto-created when entity memory count hits threshold."""
+
+    def test_auto_cluster_triggers_at_threshold(self, env):
+        reg, fs, tmp = env
+        cm = ClusterManager(reg)
+
+        # Insert 2 memories linked to "jwt" — below threshold of 3
+        for i in range(2):
+            reg.insert_memory(MemoryRecord(id=f"ac{i}", label=f"jwt mem {i}"))
+            eid = reg.upsert_entity("jwt", "concept")
+            reg.link_memory_entity(f"ac{i}", eid)
+
+        # Should not cluster yet
+        result = cm.auto_update_for_memory("ac1", ["jwt"], threshold=3)
+        assert len(result) == 0
+
+        # Add 3rd memory — hits threshold
+        reg.insert_memory(MemoryRecord(id="ac2", label="jwt mem 2"))
+        eid = reg.upsert_entity("jwt", "concept")
+        reg.link_memory_entity("ac2", eid)
+
+        result = cm.auto_update_for_memory("ac2", ["jwt"], threshold=3)
+        assert len(result) == 1
+        assert "jwt" in result[0].entity_tags
+        assert len(result[0].memory_ids) == 3
+
+    def test_auto_cluster_updates_existing(self, env):
+        reg, fs, tmp = env
+        cm = ClusterManager(reg)
+
+        # Create initial cluster with 3 memories
+        for i in range(3):
+            reg.insert_memory(MemoryRecord(id=f"up{i}", label=f"auth mem {i}"))
+            eid = reg.upsert_entity("auth", "concept")
+            reg.link_memory_entity(f"up{i}", eid)
+
+        cm.auto_update_for_memory("up2", ["auth"], threshold=3)
+        clusters_before = cm.list_clusters()
+        assert len(clusters_before) == 1
+        assert len(clusters_before[0].memory_ids) == 3
+
+        # Add 4th memory — should update existing cluster, not create new one
+        reg.insert_memory(MemoryRecord(id="up3", label="auth mem 3"))
+        eid = reg.upsert_entity("auth", "concept")
+        reg.link_memory_entity("up3", eid)
+
+        cm.auto_update_for_memory("up3", ["auth"], threshold=3)
+        clusters_after = cm.list_clusters()
+        assert len(clusters_after) == 1  # still 1 cluster, not 2
+        assert len(clusters_after[0].memory_ids) == 4  # now has 4 members

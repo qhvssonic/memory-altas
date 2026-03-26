@@ -67,12 +67,56 @@ class ClusterManager:
         if not memories:
             return None
         ids = [m.id for m in memories]
+
+        # If a cluster for this entity already exists, update it
+        existing = self._find_by_entity(entity_name)
+        if existing:
+            existing.memory_ids = list(set(existing.memory_ids) | set(ids))
+            existing.summary = (
+                f"Auto-clustered {len(existing.memory_ids)} memories about '{entity_name}'"
+            )
+            self._save(existing)
+            return existing
+
         return self.create_cluster(
             name=f"cluster:{entity_name}",
             memory_ids=ids,
             summary=f"Auto-clustered {len(ids)} memories about '{entity_name}'",
             entity_tags=[entity_name],
         )
+
+    def auto_update_for_memory(
+        self, memory_id: str, entity_names: list[str], threshold: int = 3
+    ) -> list[MemoryCluster]:
+        """Called after ingestion: check each entity and auto-cluster if threshold met.
+
+        Args:
+            memory_id: The newly ingested memory ID.
+            entity_names: Entities extracted from the new memory.
+            threshold: Minimum memories per entity to trigger clustering.
+
+        Returns:
+            List of clusters that were created or updated.
+        """
+        updated: list[MemoryCluster] = []
+        for entity in entity_names:
+            memories = self.registry.get_memories_for_entity(entity)
+            if len(memories) >= threshold:
+                cluster = self.auto_cluster_by_entity(entity)
+                if cluster:
+                    updated.append(cluster)
+        return updated
+
+    def _find_by_entity(self, entity_name: str) -> MemoryCluster | None:
+        """Find an existing cluster tagged with this entity."""
+        rows = self.registry.conn.execute(
+            "SELECT * FROM memory_clusters"
+        ).fetchall()
+        for row in rows:
+            cluster = self._row_to_cluster(row)
+            if entity_name in cluster.entity_tags:
+                return cluster
+        return None
 
     def get_cluster(self, cluster_id: str) -> MemoryCluster | None:
         row = self.registry.conn.execute(

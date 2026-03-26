@@ -21,6 +21,7 @@ from memory_atlas.scene.manager import SceneManager
 from memory_atlas.maintenance.forgetting import ForgettingManager, ForgetResult
 from memory_atlas.io.exporter import Exporter
 from memory_atlas.io.importer import Importer
+from memory_atlas.core.cluster import ClusterManager
 
 
 class MemoryEngine:
@@ -62,6 +63,9 @@ class MemoryEngine:
             embedder=self.embedder,
             llm=self.llm,
         )
+
+        # Cluster Manager (auto-bundling)
+        self.cluster_mgr = ClusterManager(self.registry)
 
     # --- Ingestion ---
 
@@ -117,6 +121,11 @@ class MemoryEngine:
             for ent in extraction.entities:
                 eid = self.registry.upsert_entity(ent["name"], ent.get("type", "concept"))
                 self.registry.link_memory_entity(mid, eid)
+
+            # Auto-cluster: if an entity now has enough memories, bundle them
+            self.cluster_mgr.auto_update_for_memory(
+                mid, entity_names, threshold=self.config.auto_cluster_threshold
+            )
 
             # Add to tree index
             self._index_in_tree(mid, extraction.topics, summary_result.label)

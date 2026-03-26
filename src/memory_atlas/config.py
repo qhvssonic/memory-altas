@@ -54,6 +54,9 @@ class MemoryAtlasConfig:
     # Decay
     decay_lambda: float = 0.1  # importance decay rate
 
+    # Clustering
+    auto_cluster_threshold: int = 3  # min memories per entity to auto-cluster
+
     def save(self, path: Path | None = None) -> None:
         """Save config to JSON file."""
         target = path or Path(self.storage_path) / "config.json"
