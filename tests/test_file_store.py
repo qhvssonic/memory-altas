@@ -1,8 +1,6 @@
 """Tests for Markdown file store."""
 
 import pytest
-import tempfile
-from pathlib import Path
 from memory_atlas.storage.file_store import FileStore, MemoryChunk
 
 

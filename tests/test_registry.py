@@ -1,8 +1,6 @@
 """Tests for DuckDB registry."""
 
 import pytest
-import tempfile
-from pathlib import Path
 from memory_atlas.core.registry import Registry, MemoryRecord
 
 

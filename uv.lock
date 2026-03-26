@@ -1216,16 +1216,18 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
-dev = [
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "ruff" },
-]
 langchain = [
     { name = "langchain" },
 ]
 local-embedding = [
     { name = "sentence-transformers" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "ruff" },
 ]
 
 [package.metadata]
@@ -1234,13 +1236,17 @@ requires-dist = [
     { name = "langchain", marker = "extra == 'langchain'", specifier = ">=0.3.0" },
     { name = "litellm", specifier = ">=1.40.0" },
     { name = "numpy", specifier = ">=1.24.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0" },
-    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.23" },
     { name = "pyyaml", specifier = ">=6.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.4.0" },
     { name = "sentence-transformers", marker = "extra == 'local-embedding'", specifier = ">=2.2.0" },
 ]
-provides-extras = ["local-embedding", "langchain", "dev"]
+provides-extras = ["local-embedding", "langchain"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pytest", specifier = ">=8.0" },
+    { name = "pytest-asyncio", specifier = ">=0.23" },
+    { name = "ruff", specifier = ">=0.4.0" },
+]
 
 [[package]]
 name = "mpmath"

@@ -6,19 +6,13 @@ Uses rule-based extraction and a mock embedder to test the full pipeline.
 from __future__ import annotations
 
 import pytest
-from pathlib import Path
-from unittest.mock import patch, MagicMock
 import random
 
 from memory_atlas.config import MemoryAtlasConfig
 from memory_atlas.core.registry import Registry
 from memory_atlas.core.tree_index import TreeIndex
 from memory_atlas.storage.file_store import FileStore
-from memory_atlas.storage.cache import CacheManager, CachedMemory, CacheTier
 from memory_atlas.scene.manager import SceneManager
-from memory_atlas.scene.culler import FrustumCuller
-from memory_atlas.scene.lod import LODManager
-from memory_atlas.retrieval.fusion import FusionRanker
 
 
 class FakeEmbedder:
@@ -224,7 +218,7 @@ class TestSceneManagerCycle:
         assert scene._turn_count == 0
 
         # First turn
-        results = scene.get_memory_view("hello world")
+        scene.get_memory_view("hello world")
         assert scene._turn_count == 1
 
         # Update
@@ -249,7 +243,6 @@ class TestTreeIndexIntegration:
         from memory_atlas.core.tree_index import TreeNode
 
         tree = env["tree"]
-        reg = env["registry"]
 
         # Build tree structure
         tree.add_child("root", TreeNode(id="auth", label="Authentication"))

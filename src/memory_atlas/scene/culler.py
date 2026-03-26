@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from memory_atlas.storage.cache import CachedMemory, CacheManager
+from memory_atlas.storage.cache import CacheManager
 
 
 class FrustumCuller:

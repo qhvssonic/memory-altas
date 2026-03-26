@@ -57,7 +57,7 @@ class Summarizer:
     ) -> SummaryResult:
         """Fallback rule-based summarization."""
         # L0: first meaningful line
-        lines = [l.strip() for l in content.splitlines() if l.strip()]
+        lines = [line.strip() for line in content.splitlines() if line.strip()]
         first_line = lines[0] if lines else content[:80]
         label = first_line[:100]
 

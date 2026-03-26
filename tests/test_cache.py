@@ -1,6 +1,5 @@
 """Tests for three-tier cache manager."""
 
-import pytest
 from memory_atlas.storage.cache import CacheManager, CachedMemory, CacheTier
 
 

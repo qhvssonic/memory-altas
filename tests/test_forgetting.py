@@ -2,7 +2,6 @@
 
 import pytest
 from datetime import datetime, timezone, timedelta
-from pathlib import Path
 
 from memory_atlas.core.registry import Registry, MemoryRecord
 from memory_atlas.storage.file_store import FileStore, MemoryChunk

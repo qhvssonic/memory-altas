@@ -1,7 +1,5 @@
 """Tests for configuration management."""
 
-import pytest
-from pathlib import Path
 from memory_atlas.config import MemoryAtlasConfig
 
 
