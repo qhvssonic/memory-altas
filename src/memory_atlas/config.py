@@ -15,6 +15,10 @@ class MemoryAtlasConfig:
     # Storage
     storage_path: str = "./memory_atlas_data"
 
+    # Multi-tenant
+    user_id: str = "default"
+    agent_id: str = "default"
+
     # Embedding
     embedding_model: Literal["local", "openai", "cohere"] = "local"
     embedding_dim: int = 384  # all-MiniLM-L6-v2 default

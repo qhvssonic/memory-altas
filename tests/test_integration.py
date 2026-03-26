@@ -191,7 +191,7 @@ class TestSceneManagerCycle:
             reg.insert_memory(rec)
 
         scene.initialize_session("s3")
-        scene.get_memory_view("authentication module")
+        scene.get_memory_view("Auth memory 0")
 
         # Verify some are in hot
         hot_before = cache.get_hot()

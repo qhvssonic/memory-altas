@@ -54,8 +54,24 @@ class LiteLLMEmbedder:
         return self._dim
 
 
+class CustomEmbedder:
+    """User-provided custom embedder wrapping any callable."""
+
+    def __init__(self, embed_fn, dim: int):
+        self._fn = embed_fn
+        self._dim = dim
+
+    def embed(self, texts: list[str]) -> list[list[float]]:
+        return self._fn(texts)
+
+    @property
+    def dim(self) -> int:
+        return self._dim
+
+
 def create_embedder(
-    mode: str = "local", model: str | None = None, dim: int | None = None
+    mode: str = "local", model: str | None = None, dim: int | None = None,
+    embed_fn=None,
 ) -> Embedder:
     """Factory for creating an embedder instance."""
     if mode == "local":
@@ -68,5 +84,13 @@ def create_embedder(
         return LiteLLMEmbedder(
             model=model or "cohere/embed-english-v3.0", dim=dim or 1024
         )
+    elif mode == "ollama":
+        return LiteLLMEmbedder(
+            model=model or "ollama/nomic-embed-text", dim=dim or 768
+        )
+    elif mode == "custom":
+        if embed_fn is None:
+            raise ValueError("custom mode requires embed_fn")
+        return CustomEmbedder(embed_fn=embed_fn, dim=dim or 384)
     else:
         raise ValueError(f"Unknown embedding mode: {mode}")

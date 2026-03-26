@@ -53,13 +53,23 @@ MemoryAtlas 的核心卖点是 Scene Manager（场景管理器），这是目前
 | **文档** | API 文档 | ✅ 完成 | P1 | docs/API.md |
 | | 使用示例 | ✅ 完成 | P0 | examples/langchain_agent.py |
 
-### v0.2.0 — 增强版（规划中）
+### v0.2.0 — 增强版
 
-- [ ] 记忆簇（Memory Cluster / Asset Bundling）
-- [ ] 多用户/多智能体支持
-- [ ] 记忆导入/导出
-- [ ] Web UI 可视化记忆图谱
-- [ ] 更多 embedding 模型支持
+目标：多用户支持、记忆簇、导入导出、更多 embedding 模型。
+
+| 模块 | 任务 | 状态 | 优先级 | 备注 |
+|---|---|---|---|---|
+| **记忆导入/导出** | JSON 导出 | ✅ 完成 | P0 | 全量/按 session, 含 L2 内容 |
+| | JSON 导入 | ✅ 完成 | P0 | merge/overwrite 两种模式 |
+| **多用户支持** | user_id 隔离 | ✅ 完成 | P0 | DuckDB 列 + list_memories 过滤 |
+| | 多智能体命名空间 | ✅ 完成 | P1 | agent_id 分区 |
+| **记忆簇** | MemoryCluster 数据模型 | ✅ 完成 | P0 | DuckDB 表 + CRUD |
+| | 簇的自动聚合 | ✅ 完成 | P1 | 基于实体自动归簇 |
+| | 簇级别 LOD | ⬜ 待开始 | P1 | 整簇摘要 |
+| **Embedding 扩展** | Ollama 本地模型 | ✅ 完成 | P0 | 通过 LiteLLM |
+| | 自定义 Embedder 接口 | ✅ 完成 | P1 | CustomEmbedder(embed_fn, dim) |
+| **Web UI** | 记忆图谱可视化 | ⬜ 待开始 | P2 | 独立 HTML，可选 |
+| **测试** | v0.2 新功能测试 | ✅ 完成 | P0 | 13 tests |
 
 ### v0.3.0 — 生态集成（规划中）
 

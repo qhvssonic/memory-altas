@@ -25,6 +25,8 @@ class MemoryRecord:
 
     id: str
     session_id: str = ""
+    user_id: str = "default"
+    agent_id: str = "default"
     created_at: str = ""
     updated_at: str = ""
     label: str = ""
@@ -46,6 +48,8 @@ class Registry:
     CREATE TABLE IF NOT EXISTS memories (
         id VARCHAR PRIMARY KEY,
         session_id VARCHAR,
+        user_id VARCHAR DEFAULT 'default',
+        agent_id VARCHAR DEFAULT 'default',
         created_at VARCHAR,
         updated_at VARCHAR,
         label VARCHAR,
@@ -127,12 +131,13 @@ class Registry:
 
         self.conn.execute(
             """INSERT INTO memories
-               (id, session_id, created_at, updated_at, label, summary,
+               (id, session_id, user_id, agent_id, created_at, updated_at, label, summary,
                 file_path, embedding, importance_score, access_count,
                 last_accessed_at, parent_node, cache_tier, metadata)
-               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             [
-                rec.id, rec.session_id, rec.created_at, rec.updated_at,
+                rec.id, rec.session_id, rec.user_id, rec.agent_id,
+                rec.created_at, rec.updated_at,
                 rec.label, rec.summary, rec.file_path,
                 rec.embedding, rec.importance_score, rec.access_count,
                 rec.last_accessed_at, rec.parent_node, rec.cache_tier,
@@ -182,17 +187,27 @@ class Registry:
         )
 
     def list_memories(
-        self, session_id: str | None = None, limit: int = 100
+        self, session_id: str | None = None, user_id: str | None = None,
+        agent_id: str | None = None, limit: int = 100,
     ) -> list[MemoryRecord]:
+        conditions = []
+        params: list = []
         if session_id:
-            rows = self.conn.execute(
-                "SELECT * FROM memories WHERE session_id = ? ORDER BY created_at DESC LIMIT ?",
-                [session_id, limit],
-            ).fetchall()
-        else:
-            rows = self.conn.execute(
-                "SELECT * FROM memories ORDER BY created_at DESC LIMIT ?", [limit]
-            ).fetchall()
+            conditions.append("session_id = ?")
+            params.append(session_id)
+        if user_id:
+            conditions.append("user_id = ?")
+            params.append(user_id)
+        if agent_id:
+            conditions.append("agent_id = ?")
+            params.append(agent_id)
+
+        where = f"WHERE {' AND '.join(conditions)}" if conditions else ""
+        params.append(limit)
+        rows = self.conn.execute(
+            f"SELECT * FROM memories {where} ORDER BY created_at DESC LIMIT ?",
+            params,
+        ).fetchall()
         return [self._row_to_record(r) for r in rows]
 
     # --- Vector search ---
@@ -355,16 +370,18 @@ class Registry:
         return MemoryRecord(
             id=row[0],
             session_id=row[1] or "",
-            created_at=row[2] or "",
-            updated_at=row[3] or "",
-            label=row[4] or "",
-            summary=row[5] or "",
-            file_path=row[6] or "",
-            embedding=list(row[7]) if row[7] else [],
-            importance_score=float(row[8]) if row[8] is not None else 0.5,
-            access_count=int(row[9]) if row[9] is not None else 0,
-            last_accessed_at=row[10] or "",
-            parent_node=row[11] or "",
-            cache_tier=row[12] or "cold",
-            metadata=row[13] if row[13] else {},
+            user_id=row[2] or "default",
+            agent_id=row[3] or "default",
+            created_at=row[4] or "",
+            updated_at=row[5] or "",
+            label=row[6] or "",
+            summary=row[7] or "",
+            file_path=row[8] or "",
+            embedding=list(row[9]) if row[9] else [],
+            importance_score=float(row[10]) if row[10] is not None else 0.5,
+            access_count=int(row[11]) if row[11] is not None else 0,
+            last_accessed_at=row[12] or "",
+            parent_node=row[13] or "",
+            cache_tier=row[14] or "cold",
+            metadata=row[15] if row[15] else {},
         )

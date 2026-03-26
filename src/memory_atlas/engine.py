@@ -19,6 +19,8 @@ from memory_atlas.ingestion.extractor import Extractor
 from memory_atlas.ingestion.summarizer import Summarizer
 from memory_atlas.scene.manager import SceneManager
 from memory_atlas.maintenance.forgetting import ForgettingManager, ForgetResult
+from memory_atlas.io.exporter import Exporter
+from memory_atlas.io.importer import Importer
 
 
 class MemoryEngine:
@@ -187,6 +189,24 @@ class MemoryEngine:
             decay_lambda=self.config.decay_lambda,
         )
         return fm.run_cycle(limit=limit)
+
+    # --- Import / Export ---
+
+    def export_memories(
+        self, output_path: str, session_id: str | None = None, include_l2: bool = True
+    ) -> dict:
+        """Export memories to a JSON file."""
+        exporter = Exporter(self.registry, self.file_store)
+        if session_id:
+            return exporter.export_session(session_id, output_path, include_l2)
+        return exporter.export_all(output_path, include_l2)
+
+    def import_memories(
+        self, input_path: str, mode: str = "merge"
+    ) -> dict:
+        """Import memories from a JSON file. mode: 'merge' or 'overwrite'."""
+        importer = Importer(self.registry, self.file_store)
+        return importer.import_file(input_path, mode=mode)
 
     def close(self) -> None:
         """Clean up resources."""
