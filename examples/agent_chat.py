@@ -16,7 +16,6 @@ import os
 import sys
 import hashlib
 import random
-import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
@@ -94,14 +93,14 @@ chat_llm = ChatOpenAI(
 )
 
 # MemoryAtlas
-TMP_DIR = tempfile.mkdtemp()
+DATA_DIR = str(Path(__file__).parent.parent / "memory_data")
 config = MemoryAtlasConfig(
-    storage_path=TMP_DIR, hot_capacity=10, warm_capacity=50,
+    storage_path=DATA_DIR, hot_capacity=10, warm_capacity=50,
     prefetch_enabled=False, culling_enabled=True,
 )
-registry = Registry(Path(TMP_DIR) / "index.duckdb")
-tree = TreeIndex(TMP_DIR)
-file_store = FileStore(TMP_DIR)
+registry = Registry(Path(DATA_DIR) / "index.duckdb")
+tree = TreeIndex(DATA_DIR)
+file_store = FileStore(DATA_DIR)
 embedder = SimpleEmbedder()
 llm_wrapper = DeepSeekLLMWrapper(chat_llm)
 scene = SceneManager(config, registry, tree, file_store, embedder, llm_wrapper)

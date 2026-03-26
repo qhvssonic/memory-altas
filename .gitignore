@@ -11,3 +11,4 @@ tree_index.json
 chunks/
 *.log
 .ruff_cache/
+memory_data/
