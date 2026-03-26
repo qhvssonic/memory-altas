@@ -48,7 +48,7 @@ MemoryAtlas 的核心卖点是 Scene Manager（场景管理器），这是目前
 | | 预加载准确率测试 | ⬜ 待开始 | P0 | 证明预加载价值 |
 | | Token 节省率测试 | ⬜ 待开始 | P0 | 证明 LOD 价值 |
 | | 延迟对比测试 | ⬜ 待开始 | P1 | 缓存 vs 冷区 |
-| **测试** | 单元测试 | ⬜ 待开始 | P0 | pytest |
+| **测试** | 单元测试 | ✅ 完成 | P0 | 61 tests, 9 文件, uv run pytest |
 | | 集成测试 | ⬜ 待开始 | P1 | 端到端流程 |
 | **文档** | API 文档 | ⬜ 待开始 | P1 | |
 | | 使用示例 | ✅ 完成 | P0 | examples/langchain_agent.py |

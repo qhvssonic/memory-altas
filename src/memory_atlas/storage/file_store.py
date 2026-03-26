@@ -59,10 +59,10 @@ class MemoryChunk:
         entities_raw = entities_raw.strip("[]")
         entities = [e.strip() for e in entities_raw.split(",") if e.strip()]
 
-        # Extract title from body
+        # Extract title from body (first # line)
         title = ""
         content = body
-        title_match = re.match(r"^#\s+(.+)\n?(.*)", body, re.DOTALL)
+        title_match = re.match(r"^#\s+(.+?)(?:\n|$)(.*)", body, re.DOTALL)
         if title_match:
             title = title_match.group(1).strip()
             content = title_match.group(2).strip()
