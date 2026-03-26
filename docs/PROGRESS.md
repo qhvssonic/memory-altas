@@ -50,7 +50,7 @@ MemoryAtlas 的核心卖点是 Scene Manager（场景管理器），这是目前
 | | 延迟对比测试 | ✅ 完成 | P1 | 缓存 0.3µs vs 冷区 22ms, 69000x 加速 |
 | **测试** | 单元测试 | ✅ 完成 | P0 | 72 tests, 11 文件, uv run pytest |
 | | 集成测试 | ✅ 完成 | P1 | 6 个端到端测试 (FakeEmbedder/FakeLLM) |
-| **文档** | API 文档 | ⬜ 待开始 | P1 | |
+| **文档** | API 文档 | ✅ 完成 | P1 | docs/API.md |
 | | 使用示例 | ✅ 完成 | P0 | examples/langchain_agent.py |
 
 ### v0.2.0 — 增强版（规划中）
@@ -116,7 +116,7 @@ MemoryAtlas 的核心卖点是 Scene Manager（场景管理器），这是目前
 
 ### 待完成
 
-- API 文档
+v0.1.0 所有任务已完成，进入 v0.2.0 规划阶段。
 
 ## 灵感来源
 
